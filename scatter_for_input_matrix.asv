@@ -1,0 +1,9 @@
+function scatter_for_input_matrix(input_matrix)
+    shape_factory = {'d','c','x','s','p'};
+    shapes = shape_factory(input_matrix(3,:));
+    color_factory = {'red','blue','green','black','purple','orange','yello'};
+    %color_factory = [1,2,3,4];
+    colors = color_factory(input_matrix(3,:));
+    %scatter(input_matrix(1,:),input_matrix(2,:),15,'red');
+    labels = input_matrix(3,:)
+end

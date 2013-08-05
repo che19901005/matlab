@@ -63,15 +63,17 @@ classdef MSE < handle
       
       function Lni = find_Lni_for_input_matrix(obj, input_matrix)
           number_examples = size(input_matrix,2);
-          weight_sum_vector = zeros(1,number_examples);
           Wi = zeros(number_examples);
           for i =1: number_examples
               new_input_matrix = input_matrix;
               [indeces, distances] = obj.find_k_nearest_neighbours(new_input_matrix, i);
-              % here we define the value of t as 1.
-              distances = exp(-distances);
+              % here we define the value of t as 3.
+              distances = exp(-distances/1);
               %weight_sum_vector(i) = sum(distances);
               for j = 1:obj.number_neighbours
+                  % since we removed ith colume from the original one, so
+                  % if the index is larger then i, then that means after
+                  % removing i, index go one step ahead.
                   if indeces(j) >= i
                       indeces(j) = indeces(j)+1;
                   end
@@ -83,7 +85,8 @@ classdef MSE < handle
           % in Wi. n*1
           weight_sum_vector = sum(Wi,2);
            Di_matrix = diag(weight_sum_vector);
-           Lni = eye(number_examples)-(Di_matrix^(-0.5)) * Wi *(Di_matrix^(-0.5));
+           %Lni = eye(number_examples)-(Di_matrix^(-0.5)) * Wi *(Di_matrix^(-0.5));
+           Lni = Di_matrix^(-0.5) * (Di_matrix - Wi) * Di_matrix^(-0.5);
            %Li = Di_matrix - Wi
            %Lni_and_Li = {Lni,Li}
       end
@@ -93,8 +96,8 @@ classdef MSE < handle
       % for each view. output: L n*n
       function L = get_L_through_current_a_Ln(obj, ai, Ln)
           L = zeros(obj.number_instances);
-          for i = 1:size(ai, 2)
-             L = L + (ai(i).^obj.r) * Ln{i};
+          for i = 1: length(obj.ai)
+             L = L + (ai(i)^obj.r) * Ln{i};
           end
       end
       
@@ -104,6 +107,8 @@ classdef MSE < handle
       function Y = get_Y_through_L(obj, L)
           Y = zeros(obj.final_dimentional,obj.number_instances);
           [eigenvectors, eigenvalues] = eig(L);
+          % this method will sort sorted_value from big to small, and
+          % change sorted_vectors according to the change of eigenvalues
           [sorted_vectors,sorted_values] = sortem(eigenvectors,eigenvalues);
           for i = 1: obj.final_dimentional
               Y(i,:)= sorted_vectors(:,size(sorted_vectors,2)-i+1)';
@@ -117,11 +122,11 @@ classdef MSE < handle
       function convergence = update_and_check_convergence(obj, Y)
           last_ai = obj.ai;
           sum = 0;
-          for i = 1:size(obj.ai,2)
+          for i = 1:length(obj.ai)
               sum = sum + (1/trace(Y*obj.Ln{i}*Y'))^(1/(obj.r-1));
           end
           for i = 1: size(obj.ai,2)
-              obj.ai(i) = (1/(trace(Y*obj.Ln{i}*Y'))^(1/(obj.r-1)))/sum;
+              obj.ai(i) = (1/trace(Y*obj.Ln{i}*Y'))^(1/(obj.r-1))/sum;
           end
           disp(last_ai);
           disp(obj.ai);
