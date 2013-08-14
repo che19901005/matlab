@@ -8,6 +8,7 @@ classdef bio_data_process_output < handle
         mri_convexity;
         labels;
         final_matrix;
+        data;
     end
     
     methods(Access = public)
@@ -34,6 +35,7 @@ classdef bio_data_process_output < handle
             obj.mri_convexity = data.CONVEXITY'/max(max(data.CONVEXITY));
             
             obj.labels = data.labels';
+            obj.data = {obj.pet_cmrglc,obj.mri_volume,obj.mri_solidity,obj.mri_convexity};
         end
         
         function get_mse_low_dimentional_matrix(obj, dimentional,r, k_neighbors)

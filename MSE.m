@@ -32,11 +32,11 @@ classdef MSE < handle
             obj.ai = ones(1, size(obj.X_feature_matrices,2 ))/size(obj.X_feature_matrices,2);
             % for each model, calculate Ln for each model when we generate
             % the model.
-            for i = 1:size(obj.X_feature_matrices,2);
+            %for i = 1:size(obj.X_feature_matrices,2);
                 %Lni_and_Li = obj.find_Lni_for_input_matrix(obj.X_feature_matrices{i})
-                obj.Ln{i} = obj.find_Lni_for_input_matrix(obj.X_feature_matrices{i});
+             %   obj.Ln{i} = obj.find_Lni_for_input_matrix(obj.X_feature_matrices{i});
                 %obj.Li{i} = Lni_and_Li{2}
-            end
+            %end
         end
         
        % this method is used to find out he k-nearest neighbours matrix
@@ -61,35 +61,7 @@ classdef MSE < handle
       % feature matrix mi*n for a view and output a matrix which is Ln(i) n*n for
       % this matrix
       
-      function Lni = find_Lni_for_input_matrix(obj, input_matrix)
-          number_examples = size(input_matrix,2);
-          Wi = zeros(number_examples);
-          for i =1: number_examples
-              new_input_matrix = input_matrix;
-              [indeces, distances] = obj.find_k_nearest_neighbours(new_input_matrix, i);
-              % here we define the value of t as 3.
-              distances = exp(-distances/1);
-              %weight_sum_vector(i) = sum(distances);
-              for j = 1:obj.number_neighbours
-                  % since we removed ith colume from the original one, so
-                  % if the index is larger then i, then that means after
-                  % removing i, index go one step ahead.
-                  if indeces(j) >= i
-                      indeces(j) = indeces(j)+1;
-                  end
-                  Wi(i, indeces(j)) =  distances(j);
-                  Wi(indeces(j), i) = distances(j);
-              end
-          end
-          % weight_sum_vector is a colume vector contains sum of each row
-          % in Wi. n*1
-          weight_sum_vector = sum(Wi,2);
-           Di_matrix = diag(weight_sum_vector);
-           %Lni = eye(number_examples)-(Di_matrix^(-0.5)) * Wi *(Di_matrix^(-0.5));
-           Lni = Di_matrix^(-0.5) * (Di_matrix - Wi) * Di_matrix^(-0.5);
-           %Li = Di_matrix - Wi
-           %Lni_and_Li = {Lni,Li}
-      end
+      
       
       % this method will be used to calculate L with current ai vector and
       % Ln for all views. input: ai vector: 1 * m / Ln: contain m matrices
@@ -138,6 +110,11 @@ classdef MSE < handle
       % to do the entire training progress.
       
       function final_Y = train(obj)
+          for i = 1:size(obj.X_feature_matrices,2);
+                %Lni_and_Li = obj.find_Lni_for_input_matrix(obj.X_feature_matrices{i})
+                obj.Ln{i} = obj.find_Lni_for_input_matrix(obj.X_feature_matrices{i});
+                %obj.Li{i} = Lni_and_Li{2}
+          end
           times = 1;
           L = obj.get_L_through_current_a_Ln(obj.ai, obj.Ln);
           Y =  obj.get_Y_through_L(L);
@@ -166,10 +143,41 @@ classdef MSE < handle
               L = obj.get_L_through_current_a_Ln(obj.ai, obj.Ln);
                Y =  obj.get_Y_through_L(L);
           end
-          final_L = obj.get_L_through_current_a_Ln(obj.ai, obj.Ln);
+          final_L = obj.get_L_through_current_a_Ln(obj.ai, obj.Ln);s
           final_Y = obj.get_Y_through_L(final_L);
       end
         
+    end
+    methods(Access = private)
+    function Lni = find_Lni_for_input_matrix(obj, input_matrix)
+          number_examples = size(input_matrix,2);
+          Wi = zeros(number_examples);
+          for i =1: number_examples
+              new_input_matrix = input_matrix;
+              [indeces, distances] = obj.find_k_nearest_neighbours(new_input_matrix, i);
+              % here we define the value of t as 3.
+              distances = exp(-distances);
+              %weight_sum_vector(i) = sum(distances);
+              for j = 1:length(indeces)
+                  % since we removed ith colume from the original one, so
+                  % if the index is larger then i, then that means after
+                  % removing i, index go one step ahead.
+                  if indeces(j) >= i
+                      indeces(j) = indeces(j)+1;
+                  end
+                  Wi(i, indeces(j)) =  distances(j);
+                  Wi(indeces(j), i) = distances(j);
+              end
+          end
+          % weight_sum_vector is a colume vector contains sum of each row
+          % in Wi. n*1
+          weight_sum_vector = sum(Wi,2);
+           Di_matrix = diag(weight_sum_vector);
+           %Lni = eye(number_examples)-(Di_matrix^(-0.5)) * Wi *(Di_matrix^(-0.5));
+           Lni = Di_matrix^(-0.5) * (Di_matrix - Wi) * Di_matrix^(-0.5);
+           %Li = Di_matrix - Wi
+           %Lni_and_Li = {Lni,Li}
+    end
     end
     
 end

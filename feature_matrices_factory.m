@@ -36,8 +36,8 @@ classdef feature_matrices_factory
             pwt_max = max(max(pwt_feature_matrix));
             % then we will use the maximum values of the two matrix to make
             % two matrices values are in range (0,1)
-            hsv_feature_matrix = hsv_feature_matrix / hsv_max;
-            pwt_feature_matrix = pwt_feature_matrix / pwt_max;
+            %hsv_feature_matrix = hsv_feature_matrix / hsv_max;
+            %pwt_feature_matrix = pwt_feature_matrix / pwt_max;
             multi_feature_matrices = {hsv_feature_matrix, pwt_feature_matrix};
         end
     end

@@ -10,8 +10,8 @@ function scatter_for_input_matrix(input_matrix)
     three_index = find(labels == 3,1);
     four_index = find(labels == 4,1);
     s = 40;
-    %scatter(input_matrix(1,1:two_index-1),input_matrix(2,1:two_index-1),s,'red','+'); hold on
-    scatter(input_matrix(1, 1: three_index-1),input_matrix(2,1: three_index-1),s,'blue','c','filled'); hold on
-    %scatter(input_matrix(1,three_index: four_index-1),input_matrix(2,three_index: four_index-1),s, 'green', 'x'); hold on
-    scatter(input_matrix(1,three_index:length(labels)),input_matrix(2,three_index:length(labels)),s,'black','s','filled');
+    scatter(input_matrix(1,1:two_index-1),input_matrix(2,1:two_index-1),s,'red','+'); hold on
+    scatter(input_matrix(1, two_index: three_index-1),input_matrix(2,two_index: three_index-1),30,'blue','c','filled'); hold on
+    scatter(input_matrix(1,three_index: four_index-1),input_matrix(2,three_index: four_index-1),s, 'green', 'x'); hold on
+    scatter(input_matrix(1,four_index:length(labels)),input_matrix(2,four_index:length(labels)),30,'black','s','filled');
 end
