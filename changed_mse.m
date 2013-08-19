@@ -14,15 +14,18 @@ function Y = changed_mse(d,data, r, k )
     for i = 1:length(Lni)
         Yi{i} = mse.get_Y_through_L(Lni{i});
     end
-    Y = zeros(d,mse.number_instances);
+    disp(Yi);
+    Y = zeros(d,mse.number_instances)
     for i = 1: length(Yi)
-        Y = Y + mse.ai(i)^r * Yi{i}; 
+        Y = Y + mse.ai(i)^r * Yi{i}
     end
     while(mse.update_and_check_convergence(Y) == 0)
+         Y = zeros(d,mse.number_instances);
          for i = 1: length(Yi)
-            Y = Y + mse.ai(i)^r * Yi{i}; 
+            Y = Y + (mse.ai(i)^r * Yi{i}); 
          end
     end
+     Y = zeros(d,mse.number_instances);
      for i = 1: length(Yi)
             Y = Y + mse.ai(i)^r * Yi{i}; 
      end
